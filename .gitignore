@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 .vite/
 
 lib
+
+# fuck you macOS
+.DS_Store

@@ -111,7 +111,7 @@ export class UpyunStorageService {
     const fexios = new Fexios({
       baseURL: rest.baseURL,
     })
-    fexios.interceptors.request.use((ctx) => {
+    fexios.interceptors.request.use(async (ctx) => {
       const date = new Date().toUTCString()
 
       ctx.headers = (ctx.headers as Record<string, string>) || {}
@@ -122,7 +122,7 @@ export class UpyunStorageService {
         const uri = ctx.url?.startsWith('/')
           ? ctx.url
           : new URL(ctx.url || '').pathname
-        ctx.headers.authorization = credentials.signatureToken({
+        ctx.headers.authorization = await credentials.signatureToken({
           uri,
           date,
           method: ctx.method?.toUpperCase() || 'GET',

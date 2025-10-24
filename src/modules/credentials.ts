@@ -14,23 +14,8 @@ export class UpyunStorageCredentials {
     return `Basic ${btoa(`${this.operator}:${this.secret}`)}`
   }
 
-  /**
-   * Signature Token
-   *
-   * ```
-   * Authorization: UPYUN <Operator>:<Signature>
-   * <Signature> = Base64(
-   *   HMAC-SHA1(
-   *     <Password>,
-   *     <Method>&
-   *     <URI>&
-   *     <Date>&
-   *     <Content-MD5> (Optional)
-   *   )
-   * )
-   * ```
-   */
-  signatureToken(payload: {
+  // Signature Token
+  async signatureToken(payload: {
     method: string
     uri: string
     date: string | number | Date
@@ -43,7 +28,7 @@ export class UpyunStorageCredentials {
     const body = [method, uri, date, payload.contentMD5]
       .filter((i) => i !== void 0 && i !== null)
       .join('&')
-    const token = toBase64(hmacSHA1(body, password))
+    const token = toBase64(await hmacSHA1(body, password))
     return `UPYUN ${this.operator}:${token}`
   }
 }
