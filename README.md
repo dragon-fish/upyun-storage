@@ -1,8 +1,8 @@
-# upyun-storage
+# Upyun Plus
 
-☁️ 又一个又拍云存储 SDK
+☁️ 又一个又拍云 API SDK
 
-[![npm version](https://img.shields.io/npm/v/upyun-storage.svg)](https://www.npmjs.com/package/upyun-storage)
+[![npm version](https://img.shields.io/npm/v/upyun-plus.svg)](https://www.npmjs.com/package/upyun-plus)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 特性
@@ -18,14 +18,14 @@
 ## 安装
 
 ```bash
-npm install upyun-storage
+npm install upyun-plus
 ```
 
 或使用其他包管理器：
 
 ```bash
-yarn add upyun-storage
-pnpm add upyun-storage
+yarn add upyun-plus
+pnpm add upyun-plus
 ```
 
 ## 快速开始
@@ -33,7 +33,7 @@ pnpm add upyun-storage
 ### 基础配置
 
 ```typescript
-import { UpyunStorageService } from 'upyun-storage'
+import { UpyunStorageService } from 'upyun-plus'
 
 const upyun = new UpyunStorageService({
   bucket: 'your-bucket-name',
@@ -122,7 +122,7 @@ await upyun.purgeByPatterns(patterns)
 
 ### UpyunStorageService
 
-主要的服务类，提供所有又拍云存储操作。
+又拍云存储服务类，提供所有又拍云存储操作。
 
 #### 构造函数选项
 
@@ -216,8 +216,8 @@ try {
 
 ```bash
 # 克隆仓库
-git clone https://github.com/dragon-fish/upyun-storage.git
-cd upyun-storage
+git clone https://github.com/dragon-fish/upyun-plus.git
+cd upyun-plus
 
 # 安装依赖
 pnpm install

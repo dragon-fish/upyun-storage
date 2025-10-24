@@ -1,7 +1,7 @@
 {
-  "name": "upyun-storage",
+  "name": "upyun-plus",
   "version": "1.0.0",
-  "description": "☁️ Yet another upyun storage SDK",
+  "description": "☁️ Yet another upyun API SDK",
   "author": "dragon-fish",
   "license": "MIT",
   "type": "module",

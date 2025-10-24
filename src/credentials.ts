@@ -6,10 +6,12 @@ export class UpyunCredentials {
     public readonly secret: string
   ) {}
 
-  // Token
+  // Basic Token
   basicToken() {
     return `Basic ${btoa(`${this.operator}:${this.secret}`)}`
   }
+
+  // Signature Token
   signatureToken(payload: {
     method: string
     uri: string
