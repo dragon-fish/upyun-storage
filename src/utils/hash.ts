@@ -1,35 +1,23 @@
+export function toHex(uint8Array: Uint8Array): string {
+  return Array.from(uint8Array)
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+export function toBase64(uint8Array: Uint8Array): string {
+  const binaryString = String.fromCharCode(...uint8Array)
+  return btoa(binaryString)
+}
+
 function stringToBytes(str: string): number[] {
-  const bytes: number[] = []
-  for (let i = 0; i < str.length; i++) {
-    const charCode = str.charCodeAt(i)
-    if (charCode < 0x80) {
-      bytes.push(charCode)
-    } else if (charCode < 0x800) {
-      bytes.push(0xc0 | (charCode >> 6))
-      bytes.push(0x80 | (charCode & 0x3f))
-    } else if (charCode < 0xd800 || charCode >= 0xe000) {
-      bytes.push(0xe0 | (charCode >> 12))
-      bytes.push(0x80 | ((charCode >> 6) & 0x3f))
-      bytes.push(0x80 | (charCode & 0x3f))
-    } else {
-      i++
-      const charCode2 = str.charCodeAt(i)
-      const codePoint =
-        0x10000 + (((charCode & 0x3ff) << 10) | (charCode2 & 0x3ff))
-      bytes.push(0xf0 | (codePoint >> 18))
-      bytes.push(0x80 | ((codePoint >> 12) & 0x3f))
-      bytes.push(0x80 | ((codePoint >> 6) & 0x3f))
-      bytes.push(0x80 | (codePoint & 0x3f))
-    }
-  }
-  return bytes
+  return Array.from(new TextEncoder().encode(str))
 }
 
 function rotateLeft(value: number, amount: number): number {
   return ((value << amount) | (value >>> (32 - amount))) >>> 0
 }
 
-export const md5 = (data: string): string => {
+export function md5(data: string): Uint8Array {
   const bytes = stringToBytes(data)
   const messageLength = bytes.length
 
@@ -102,10 +90,19 @@ export const md5 = (data: string): string => {
     h3 = (h3 + d) >>> 0
   }
 
-  return [h0, h1, h2, h3].map((h) => h.toString(16).padStart(8, '0')).join('')
+  const result = new Uint8Array(16)
+  for (let i = 0; i < 4; i++) {
+    const h = [h0, h1, h2, h3][i]
+    result[i * 4] = (h >>> 0) & 0xff
+    result[i * 4 + 1] = (h >>> 8) & 0xff
+    result[i * 4 + 2] = (h >>> 16) & 0xff
+    result[i * 4 + 3] = (h >>> 24) & 0xff
+  }
+
+  return result
 }
 
-export const sha1 = (data: string): string => {
+export function sha1(data: string): Uint8Array {
   const bytes = stringToBytes(data)
   const messageLength = bytes.length
 
@@ -115,7 +112,7 @@ export const sha1 = (data: string): string => {
   }
 
   const bitLength = messageLength * 8
-  for (let i = 7; i >= 0; i--) {
+  for (let i = 0; i < 8; i++) {
     bytes.push((bitLength >>> (i * 8)) & 0xff)
   }
 
@@ -130,10 +127,10 @@ export const sha1 = (data: string): string => {
 
     for (let i = 0; i < 16; i++) {
       w[i] =
-        ((bytes[chunk + i * 4] << 24) |
-          (bytes[chunk + i * 4 + 1] << 16) |
-          (bytes[chunk + i * 4 + 2] << 8) |
-          bytes[chunk + i * 4 + 3]) >>>
+        (bytes[chunk + i * 4] |
+          (bytes[chunk + i * 4 + 1] << 8) |
+          (bytes[chunk + i * 4 + 2] << 16) |
+          (bytes[chunk + i * 4 + 3] << 24)) >>>
         0
     }
 
@@ -179,56 +176,35 @@ export const sha1 = (data: string): string => {
     h4 = (h4 + e) >>> 0
   }
 
-  return [h0, h1, h2, h3, h4]
-    .map((h) => h.toString(16).padStart(8, '0'))
-    .join('')
-}
-
-function bytesToHex(bytes: number[]): string {
-  return bytes.map((b) => b.toString(16).padStart(2, '0')).join('')
-}
-
-function hexToBytes(hex: string): number[] {
-  const bytes: number[] = []
-  for (let i = 0; i < hex.length; i += 2) {
-    bytes.push(parseInt(hex.substr(i, 2), 16))
+  const result = new Uint8Array(20)
+  for (let i = 0; i < 5; i++) {
+    const h = [h0, h1, h2, h3, h4][i]
+    result[i * 4] = (h >>> 24) & 0xff
+    result[i * 4 + 1] = (h >>> 16) & 0xff
+    result[i * 4 + 2] = (h >>> 8) & 0xff
+    result[i * 4 + 3] = h & 0xff
   }
-  return bytes
-}
 
-function xorBytes(a: number[], b: number[]): number[] {
-  const result: number[] = []
-  const maxLength = Math.max(a.length, b.length)
-  for (let i = 0; i < maxLength; i++) {
-    result.push((a[i] || 0) ^ (b[i] || 0))
-  }
   return result
 }
 
-export const hmacSHA1 = (data: string, key: string): string => {
+export function hmacSHA1(message: string, key: string): Uint8Array {
   const blockSize = 64
-  let keyBytes = stringToBytes(key)
-  if (keyBytes.length > blockSize) {
-    const keyHash = sha1(key)
-    keyBytes = hexToBytes(keyHash)
-  }
-  while (keyBytes.length < blockSize) {
-    keyBytes.push(0)
-  }
-  const ipad = new Array(blockSize).fill(0x36)
-  const opad = new Array(blockSize).fill(0x5c)
-  const innerKey = xorBytes(keyBytes, ipad)
-  const innerData = [...innerKey, ...stringToBytes(data)]
-  const innerHash = sha1(bytesToHex(innerData))
-  const outerKey = xorBytes(keyBytes, opad)
-  const outerData = [...outerKey, ...hexToBytes(innerHash)]
-  const outerHash = sha1(bytesToHex(outerData))
+  const keyBytes = stringToBytes(key)
 
-  return outerHash
-}
+  const keyHash = keyBytes.length > blockSize ? Array.from(sha1(key)) : keyBytes
 
-export const hexToBase64 = (hexString: string): string => {
-  const bytes = hexToBytes(hexString)
-  const binaryString = bytes.map((b) => String.fromCharCode(b)).join('')
-  return btoa(binaryString)
+  const paddedKey = new Array(blockSize).fill(0)
+  keyHash.forEach((byte, i) => {
+    paddedKey[i] = byte
+  })
+
+  const innerPad = paddedKey.map((byte) => byte ^ 0x36)
+  const outerPad = paddedKey.map((byte) => byte ^ 0x5c)
+
+  const innerMessage = [...innerPad, ...stringToBytes(message)]
+  const innerHash = Array.from(sha1(String.fromCharCode(...innerMessage)))
+
+  const outerMessage = [...outerPad, ...innerHash]
+  return sha1(String.fromCharCode(...outerMessage))
 }

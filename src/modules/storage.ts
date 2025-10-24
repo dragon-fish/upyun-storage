@@ -3,8 +3,8 @@ import {
   type FexiosFinalContext,
   type FexiosRequestOptions,
 } from 'fexios'
-import { UpyunCredentials } from './credentials.js'
-import { trimSlashes } from './string.js'
+import { UpyunStorageCredentials } from './credentials.js'
+import { trimSlashes } from '../utils/string.js'
 
 export interface UpyunServiceOptions {
   /**
@@ -84,7 +84,7 @@ export enum UpyunKeywords {
 export class UpyunStorageService {
   public readonly options: UpyunServiceOptions
   readonly fetch: Fexios
-  readonly credentials: UpyunCredentials
+  readonly credentials: UpyunStorageCredentials
 
   constructor(options: UpyunServiceOptions) {
     const opt = (this.options = {
@@ -92,7 +92,7 @@ export class UpyunStorageService {
       adminApiBaseURL: 'https://api.upyun.com/',
       ...options,
     })
-    const cred = (this.credentials = new UpyunCredentials(
+    const cred = (this.credentials = new UpyunStorageCredentials(
       opt.operator,
       opt.secret
     ))
@@ -105,7 +105,7 @@ export class UpyunStorageService {
 
   static createFetch(options: {
     baseURL: string
-    credentials: UpyunCredentials
+    credentials: UpyunStorageCredentials
   }) {
     const { credentials, ...rest } = options
     const fexios = new Fexios({
