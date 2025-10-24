@@ -1,0 +1,72 @@
+{
+  "name": "upyun-storage",
+  "version": "1.0.0",
+  "description": "☁️ Yet another upyun storage SDK",
+  "author": "dragon-fish",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "browser": "lib/index.umd.cjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "lib"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./src/*": {
+      "source": "./src/*",
+      "types": "./src/*"
+    },
+    "./dist/*": {
+      "source": "./dist/*",
+      "types": "./dist/*"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p build:*",
+    "build:import": "cross-env VITE_BUILD_FORMAT=import vite build",
+    "build:bundle": "cross-env VITE_BUILD_FORMAT=bundle vite build",
+    "prepublish": "npm run build",
+    "clean": "rimraf dist/*",
+    "format": "prettier --write ./src",
+    "typecheck": "tsc -b --pretty false --noEmit"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.53.1",
+    "@types/node": "^22.18.12",
+    "cross-env": "^10.1.0",
+    "npm-run-all2": "^8.0.4",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.3",
+    "unplugin-dts": "1.0.0-beta.6",
+    "vite": "^7.1.11"
+  },
+  "dependencies": {
+    "fexios": "^3.2.0"
+  },
+  "keywords": [
+    "upyun",
+    "storage",
+    "upyun-sdk"
+  ],
+  "homepage": "https://github.com/dragon-fish/upyun-storage",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dragon-fish/upyun-storage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dragon-fish/upyun-storage/issues"
+  }
+}
